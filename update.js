@@ -1,5 +1,6 @@
 import { seedRandom, getRandomInt } from "./random.js";
 import { Snake } from "./snake.js";
+import { codes } from "./input.js";
 
 const emptyBit = 0;
 const snakeBit = 1;

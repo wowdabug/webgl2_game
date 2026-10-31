@@ -1,1 +1,2 @@
 - game over
+- working input (key pressed once)

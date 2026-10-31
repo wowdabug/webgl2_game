@@ -1,5 +1,6 @@
 import { init as updateInit, update, tick } from "./update.js";
 import { init as renderInit, render } from "./render.js";
+import { init as inputInit } from "./input.js";
 import { test } from "./test.js";
 
 let prevTime;
@@ -10,6 +11,7 @@ const threshold = (1 / ticksPerSecond) * 1000;
 async function init() {
 	updateInit();
 	await renderInit();
+	inputInit();
 }
 
 function loop() {
