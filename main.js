@@ -1,4 +1,4 @@
-import { init as updateInit, update } from "./update.js";
+import { init as updateInit, update, tick } from "./update.js";
 import { init as renderInit, render } from "./render.js";
 
 let prevTime;

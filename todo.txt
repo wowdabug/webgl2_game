@@ -1,0 +1,2 @@
+- fix incorrect collision with tail (snake push running before shift)
+- seed and xorshift

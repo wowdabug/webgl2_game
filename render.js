@@ -1,4 +1,5 @@
 import { resizeCanvasToDisplaySize, createProgramFromPaths } from "./utils.js";
+import { snake, headX, headY, foodX, foodY } from "./update.js";
 
 let canvas;
 let gl;
