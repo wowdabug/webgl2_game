@@ -9,7 +9,7 @@ const gridSizeY = 16;
 const gridSize = gridSizeX * gridSizeY;
 const grid = new Uint8Array(gridSize);
 
-export const snake = new Snake(gridSize * 2); // each snake location is a vec2
+export const snake = new Snake(gridSize * 2); // synced ring buffer for rendering
 export let headX = 0;
 export let headY = 0;
 export let foodX = 4;
@@ -29,49 +29,45 @@ function index(x, y) {
 }
 
 function pushSnake() {
-	headX += directionX;
-	headY += directionY;
-
-	if (
+	if ( // validate snake bounds
 		(headX < 0 || headX >= gridSizeX) ||
 		(headY < 0 || headY >= gridSizeY) ||
 		(grid[index(headX, headY)] === snakeBit)
 	) {
-		throw new Error("todo");
+		throw new Error("todo: game over");
 	}
 
-	grid[index(headX, headY)] = snakeBit;
+	snake.push(headX, headY);             // update ring buffer
+	grid[index(headX, headY)] = snakeBit; // update grid buffer
+}
 
-	snake.push(
-		headX,
-		headY
-	);
+function randomizeFood() {
+	let randomPosition;
+
+	do { // try to find empty position in grid
+		randomPosition = getRandomInt(gridSize);
+	} while (grid[randomPosition] !== emptyBit);
+
+	foodX = randomPosition % gridSizeX;
+	foodY = Math.floor(randomPosition / gridSizeX);
 }
 
 function shiftSnake() {
-	if (
+	if ( // if snake doesn't consume food remove tail
 		(headX === foodX) &&
 		(headY === foodY)
 	) {
-		let randomPosition;
-
-		do {
-			randomPosition = getRandomInt(gridSize);
-		} while (grid[randomPosition] !== emptyBit);
-
-		foodX = randomPosition % gridSizeX;
-		foodY = Math.floor(randomPosition / gridSizeX);
+		randomizeFood();
 	} else {
-		const [tailX, tailY] = snake.shift();
-
-		grid[index(tailX, tailY)] = emptyBit;
+		const [tailX, tailY] = snake.shift(); // update ring buffer
+		grid[index(tailX, tailY)] = emptyBit; // update grid buffer
 	}
 }
 
 export function tick() {
 	console.log(snake.getSize());
 
-	if (
+	if ( // validate direction (optional)
 		(directionX !== 0 && directionY !== 0) ||
 		(directionX < -1 || directionX > 1) ||
 		(directionY < -1 || directionY > 1)
@@ -79,6 +75,9 @@ export function tick() {
 		throw new Error("Invalid direction");
 	}
 
-	pushSnake();
+	headX += directionX;
+	headY += directionY;
+
 	shiftSnake();
+	pushSnake();
 }
