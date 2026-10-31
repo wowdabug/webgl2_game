@@ -1,5 +1,6 @@
 import { init as updateInit, update, tick } from "./update.js";
 import { init as renderInit, render } from "./render.js";
+import { test } from "./test.js";
 
 let prevTime;
 let accumulator = 0;
@@ -29,6 +30,7 @@ function loop() {
 }
 
 async function main() {
+	test();
 	await init();
 
 	prevTime = performance.now();

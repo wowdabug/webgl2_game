@@ -1,4 +1,4 @@
-import { getRandomInt } from "./random.js";
+import { seedRandom, getRandomInt } from "./random.js";
 import { Snake } from "./snake.js";
 
 const emptyBit = 0;
@@ -12,34 +12,11 @@ const grid = new Uint8Array(gridSize);
 export const snake = new Snake(gridSize * 2); // synced ring buffer for rendering
 export let headX = 0;
 export let headY = 0;
-export let foodX = 4;
-export let foodY = 0;
+export let foodX;
+export let foodY;
 
 let directionX = 1;
 let directionY = 0;
-
-export function init() {
-	snake.push(headX, headY);
-}
-
-export function update(deltaTime) { }
-
-function index(x, y) {
-	return (y * gridSizeX) + x;
-}
-
-function pushSnake() {
-	if ( // validate snake bounds
-		(headX < 0 || headX >= gridSizeX) ||
-		(headY < 0 || headY >= gridSizeY) ||
-		(grid[index(headX, headY)] === snakeBit)
-	) {
-		throw new Error("todo: game over");
-	}
-
-	snake.push(headX, headY);             // update ring buffer
-	grid[index(headX, headY)] = snakeBit; // update grid buffer
-}
 
 function randomizeFood() {
 	let randomPosition;
@@ -52,16 +29,26 @@ function randomizeFood() {
 	foodY = Math.floor(randomPosition / gridSizeX);
 }
 
+export function init() {
+	seedRandom();
+	randomizeFood();
+	pushSnake();
+}
+
+export function update(deltaTime) {}
+
+function index(x, y) {
+	return (y * gridSizeX) + x;
+}
+
+function pushSnake() {
+	snake.push(headX, headY);             // update ring buffer
+	grid[index(headX, headY)] = snakeBit; // update grid buffer
+}
+
 function shiftSnake() {
-	if ( // if snake doesn't consume food remove tail
-		(headX === foodX) &&
-		(headY === foodY)
-	) {
-		randomizeFood();
-	} else {
-		const [tailX, tailY] = snake.shift(); // update ring buffer
-		grid[index(tailX, tailY)] = emptyBit; // update grid buffer
-	}
+	const [tailX, tailY] = snake.shift(); // update ring buffer
+	grid[index(tailX, tailY)] = emptyBit; // update grid buffer
 }
 
 export function tick() {
@@ -78,6 +65,22 @@ export function tick() {
 	headX += directionX;
 	headY += directionY;
 
-	shiftSnake();
+	if ( // if snake doesn't consume food remove tail
+		(headX === foodX) &&
+		(headY === foodY)
+	) {
+		randomizeFood();
+	} else {
+		shiftSnake();
+	}
+
+	if ( // validate snake bounds
+		(headX < 0 || headX >= gridSizeX) ||
+		(headY < 0 || headY >= gridSizeY) ||
+		(grid[index(headX, headY)] === snakeBit)
+	) {
+		throw new Error("todo: game over");
+	}
+
 	pushSnake();
 }
