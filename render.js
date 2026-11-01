@@ -16,10 +16,13 @@ export async function init() {
 		throw new Error("WebGL2 not supported");
 	}
 
-	program = await createProgramFromPaths(gl, "basic.vert", "basic.frag");
+	snakeProgram = await createProgramFromPaths(gl, "snake.vert", "snake.frag");
+	foodProgram = await createProgramFromPaths(gl, "food.vert", "food.frag");
 	gl.useProgram(program);
 
-	const positionAttribLocation = gl.getAttribLocation(program, "a_position");
+	const positionAttribLocation = 0;
+	const colorAttribLocation = 1;
+
 	const resolutionUniformLocation = gl.getUniformLocation(program, "u_resolution");
 	console.log(resolutionUniformLocation)
 
@@ -53,9 +56,6 @@ export function render() {
 
 	gl.viewport(0, 0, canvas.width, canvas.height);
 	gl.clear(gl.COLOR_BUFFER_BIT);
-	gl.drawArrays(
-		gl.TRIANGLES, // mode
-		0,            // first
-		3             // count
-	);
+
+
 }
