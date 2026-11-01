@@ -20,11 +20,10 @@ export async function init() {
 	foodProgram = await createProgramFromPaths(gl, "food.vert", "food.frag");
 	gl.useProgram(program);
 
+	const resolutionUniformLocation = gl.getUniformLocation(program, "u_resolution");
+
 	const positionAttribLocation = 0;
 	const colorAttribLocation = 1;
-
-	const resolutionUniformLocation = gl.getUniformLocation(program, "u_resolution");
-	console.log(resolutionUniformLocation)
 
 	const positionBuffer = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
