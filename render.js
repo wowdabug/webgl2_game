@@ -3,7 +3,18 @@ import { snake, headX, headY, foodX, foodY } from "./update.js";
 
 let canvas;
 let gl;
-let program;
+
+let snakeProgram;
+let foodProgram;
+let snakeResolutionUniformLocation;
+let foodResolutionUniformLocation;
+
+function resolutionUniform() {
+	gl.useProgram(snakeProgram);
+	gl.uniform2f(snakeResolutionUniformLocation, canvas.width, canvas.height);
+	gl.useProgram(foodProgram);
+	gl.uniform2f(foodResolutionUniformLocation, canvas.width, canvas.height);
+}
 
 export async function init() {
 	canvas = document.getElementById("c");
@@ -18,9 +29,9 @@ export async function init() {
 
 	snakeProgram = await createProgramFromPaths(gl, "snake.vert", "snake.frag");
 	foodProgram = await createProgramFromPaths(gl, "food.vert", "food.frag");
-	gl.useProgram(program);
 
-	const resolutionUniformLocation = gl.getUniformLocation(program, "u_resolution");
+	snakeResolutionUniformLocation = gl.getUniformLocation(snakeProgram, "u_resolution");
+	foodResolutionUniformLocation = gl.getUniformLocation(foodProgram, "u_resolution");
 
 	const positionAttribLocation = 0;
 	const colorAttribLocation = 1;
@@ -46,15 +57,26 @@ export async function init() {
 		0         // offset
 	);
 
-	gl.uniform2f(resolutionUniformLocation, canvas.width, canvas.height);
+	resolutionUniform();
 	gl.clearColor(1, 1, 1, 1);
 }
 
+export function renderSnake() {
+	gl.useProgram(snakeProgram);
+}
+
+export function renderFood() {
+	gl.useProgram(foodProgram);
+}
+
 export function render() {
-	resizeCanvasToDisplaySize(canvas);
+	if (resizeCanvasToDisplaySize(canvas)) {
+		resolutionUniform();
+	}
 
 	gl.viewport(0, 0, canvas.width, canvas.height);
 	gl.clear(gl.COLOR_BUFFER_BIT);
 
-
+	renderSnake();
+	renderFood();
 }
