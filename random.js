@@ -5,7 +5,7 @@ export function seed(seed) {
 }
 
 export function seedRandom() {
-	state = Math.floor(Math.random() * 4_294_967_296);
+	seed(Math.floor(Math.random() * 4_294_967_296));
 }
 
 function getRandom() {

@@ -1,5 +1,5 @@
-export const codes = new Map();
-export const keys = new Map();
+export const codes = {};
+export const keys = {};
 
 export function init() {
 	document.addEventListener("keydown", (event) => {

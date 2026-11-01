@@ -7,7 +7,7 @@ const snakeBit = 1;
 
 const gridSizeX = 16;
 const gridSizeY = 16;
-const gridSize = gridSizeX * gridSizeY;
+export const gridSize = gridSizeX * gridSizeY;
 const grid = new Uint8Array(gridSize);
 
 export const snake = new Snake(gridSize * 2); // synced ring buffer for rendering
@@ -16,8 +16,8 @@ export let headY = 0;
 export let foodX;
 export let foodY;
 
-let directionX = 1;
-let directionY = 0;
+let movementX = 1;
+let movementY = 0;
 
 function randomizeFood() {
 	let randomPosition;
@@ -36,7 +36,35 @@ export function init() {
 	pushSnake();
 }
 
-export function update(deltaTime) {}
+export function update(deltaTime) {
+	if (codes.KeyW) {
+		if (movementY === 0) {
+			movementX = 0;
+			movementY = -1;
+		}
+	}
+
+	if (codes.KeyA) {
+		if (movementX === 0) {
+			movementX = -1;
+			movementY = 0;
+		}
+	}
+
+	if (codes.KeyS) {
+		if (movementY === 0) {
+			movementX = 0;
+			movementY = 1;
+		}
+	}
+
+	if (codes.KeyD) {
+		if (movementX === 0) {
+			movementX = 1;
+			movementY = 0;
+		}
+	}
+}
 
 function index(x, y) {
 	return (y * gridSizeX) + x;
@@ -52,36 +80,51 @@ function shiftSnake() {
 	grid[index(tailX, tailY)] = emptyBit; // update grid buffer
 }
 
+function win() {
+	throw new Error("todo");
+}
+
+function lose() {
+	throw new Error("todo");
+}
+
 export function tick() {
 	console.log(snake.getSize());
 
-	if ( // validate direction (optional)
-		(directionX !== 0 && directionY !== 0) ||
-		(directionX < -1 || directionX > 1) ||
-		(directionY < -1 || directionY > 1)
-	) {
-		throw new Error("Invalid direction");
-	}
+// 	const invalidMovement =
+// 		(movementX !== 0 && movementY !== 0) ||
+// 		(movementX < -1 || movementX > 1) ||
+// 		(movementY < -1 || movementY > 1);
+//
+// 	if (invalidMovement) {
+// 		throw new Error("Invalid direction");
+// 	}
 
-	headX += directionX;
-	headY += directionY;
+	headX += movementX;
+	headY += movementY;
 
-	if ( // if snake doesn't consume food remove tail
+	const foodCollision =
 		(headX === foodX) &&
-		(headY === foodY)
-	) {
+		(headY === foodY);
+
+	if (foodCollision) {
 		randomizeFood();
 	} else {
 		shiftSnake();
 	}
 
-	if ( // validate snake bounds
+	const boundsCollision =
 		(headX < 0 || headX >= gridSizeX) ||
 		(headY < 0 || headY >= gridSizeY) ||
-		(grid[index(headX, headY)] === snakeBit)
-	) {
-		throw new Error("todo: game over");
+		(grid[index(headX, headY)] === snakeBit);
+
+	if (boundsCollision) {
+		lose();
 	}
 
 	pushSnake();
+
+	if (snake.getSize() >= gridSize) {
+		win();
+	}
 }
